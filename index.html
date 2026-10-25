@@ -251,11 +251,11 @@ a.btn{text-decoration:none}
    Apps Script (la que termina en /exec). Si la dejas vacía,
    la app te la pedirá la primera vez que la abras.
    ========================================================== */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsDITnSkMn3mTEE60SiaAfwGfRM9L1H3tY8DVFOCsdHMAu8MXFJJXdBhFyVmR1sWgZYw/exec";
+const APPS_SCRIPT_URL = "";
 
 (function(){
 "use strict";
-const VERSION="1.0";
+const VERSION="1.1";
 const CATS=["Legumbres y granos","Pastas","Conservas","Caldos y condimentos","Salsas y aderezos","Desayuno y dulces","Lácteos y refrigerados","Bebidas","Aseo y limpieza","Otros"];
 const SUPERS=["Líder","Jumbo","Unimarc","Santa Isabel","Tottus","Alvi","Acuenta"];
 const DIAS=["dom","lun","mar","mié","jue","vie","sáb"];
@@ -477,7 +477,7 @@ function setupSheet(msg){
   openSheet(
     '<h2 id="sheet-title">Conectar con tu planilla</h2>'+
     '<p class="lead">Tus productos y compras se guardan en tu Google Sheet. Esto se hace una sola vez en cada teléfono.</p>'+
-    '<div class="field"'+(APPS_SCRIPT_URL&&!msg?' hidden':'')+'><label for="c-url">URL de la aplicación web</label><input id="c-url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(cfg.url||APPS_SCRIPT_URL)+'"></div>'+
+    '<div class="field"><label for="c-url">URL de la aplicación web</label><input id="c-url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(cfg.url||APPS_SCRIPT_URL)+'"></div>'+
     '<div class="field"><label for="c-clave">Clave</label><input id="c-clave" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="8 letras y números" value="'+esc(cfg.clave||"")+'"></div>'+
     '<p class="setup-note">La clave aparece en Apps Script al ejecutar <b>configurar</b> o <b>verClave</b>.</p>'+
     '<p id="s-err" class="err"'+(msg?'':' hidden')+'>'+esc(msg||"")+'</p>'+
@@ -486,7 +486,8 @@ function setupSheet(msg){
   );
 }
 async function conectar(btn){
-  const url=val("c-url").trim(), clave=val("c-clave").trim().toLowerCase();
+  const url=val("c-url").trim().split("?")[0].split("#")[0], clave=val("c-clave").trim().toLowerCase();
+  if(/\/dev$/.test(url)){setErr("Esa es la URL de prueba (termina en /dev). Usa la que termina en /exec: en Apps Script, Implementar → Gestionar implementaciones.");return;}
   if(!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(url)){setErr("La URL debe ser la de tu aplicación web de Apps Script (empieza con https://script.google.com y termina en /exec).");return;}
   if(!clave){setErr("Escribe la clave.");return;}
   btn.disabled=true;btn.textContent="Conectando…";setErr("");
